@@ -8,6 +8,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Create project files from BROBOT_ALL_FILES.md
+        run: |
+          rm -rf app build.gradle.kts settings.gradle.kts gradle.properties
+          python3 - <<'PY'
+          import re, os
+          t = open('BROBOT_ALL_FILES.md', encoding='utf-8').read()
+          n = 0
+          for m in re.finditer(r'## 📁 `([^`]+)`\s*\n+```[a-z]*\n(.*?)\n```', t, re.S):
+              p, c = m.group(1), m.group(2)
+              if not (p.startswith('app/') or p in ('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties')):
+                  continue
+              os.makedirs(os.path.dirname(p) or '.', exist_ok=True)
+              open(p, 'w', encoding='utf-8').write(c + '\n')
+              n += 1
+          print('files written:', n)
+          PY
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
