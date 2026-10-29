@@ -19,6 +19,8 @@ jobs:
               p, c = m.group(1), m.group(2)
               if not (p.startswith('app/') or p in ('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties')):
                   continue
+              if p.endswith('ConstellationGraph.kt'):
+                  c = c.replace('import androidx.compose.runtime.Composable\n', 'import androidx.compose.runtime.Composable\nimport androidx.compose.runtime.getValue\n', 1)
               os.makedirs(os.path.dirname(p) or '.', exist_ok=True)
               open(p, 'w', encoding='utf-8').write(c + '\n')
               n += 1
